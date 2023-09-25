@@ -76,7 +76,7 @@ function MapGrapher() {
     myMap = L.map("mapContainer", mapOptions);
 
     L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      maxZoom: 19,
+      maxZoom: 22,
       minZoom: 1,
       attribution:
         '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',

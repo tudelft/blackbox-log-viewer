@@ -521,6 +521,7 @@ function HeaderDialog(dialog, onSave) {
 		switch(sysConfig.firmwareType) {
 			case FIRMWARE_TYPE_BETAFLIGHT:
 			case FIRMWARE_TYPE_CLEANFLIGHT:
+			case FIRMWARE_TYPE_INDIFLIGHT:
 				$('.header-dialog-toggle').hide(); // selection button is not required
 					break;
 			case FIRMWARE_TYPE_INAV:
@@ -545,7 +546,7 @@ function HeaderDialog(dialog, onSave) {
 				});
 		}
 
-		if((sysConfig.firmware >= 3.0 && sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT) ||
+		if((sysConfig.firmware >= 3.0 && (sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT || sysConfig.firmwareType == FIRMWARE_TYPE_INDIFLIGHT)) ||
 		   (sysConfig.firmware >= 2.0 && sysConfig.firmwareType == FIRMWARE_TYPE_CLEANFLIGHT)) {
 
 			PID_CONTROLLER_TYPE = ([
@@ -562,7 +563,7 @@ function HeaderDialog(dialog, onSave) {
 
     	renderSelect("pidController", sysConfig.pidController, PID_CONTROLLER_TYPE);
     	
-        if(activeSysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(activeSysConfig.firmwareVersion, '4.0.0')) {
+        if((activeSysConfig.firmwareType  === FIRMWARE_TYPE_BETAFLIGHT || activeSysConfig.firmwareType  === FIRMWARE_TYPE_INDIFLIGHT)  && semver.gte(activeSysConfig.firmwareVersion, '4.0.0')) {
             $('.parameter td[name="pidController"]').css('display', 'none');
         }
 
@@ -640,7 +641,7 @@ function HeaderDialog(dialog, onSave) {
         setParameter('deadband'					,sysConfig.deadband,0);
         setParameter('yaw_deadband'				,sysConfig.yaw_deadband,0);
 
-        if (activeSysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(activeSysConfig.firmwareVersion, '3.4.0')) {
+        if ((activeSysConfig.firmwareType  === FIRMWARE_TYPE_BETAFLIGHT || activeSysConfig.firmwareType  === FIRMWARE_TYPE_INDIFLIGHT)  && semver.gte(activeSysConfig.firmwareVersion, '3.4.0')) {
             renderSelect('gyro_hardware_lpf'       ,sysConfig.gyro_lpf, GYRO_HARDWARE_LPF);
 
         } else {
@@ -674,7 +675,7 @@ function HeaderDialog(dialog, onSave) {
 		setParameter('gyro_lowpass_hz'			,sysConfig.gyro_lowpass_hz,0);
 		setParameter('gyro_lowpass2_hz'         ,sysConfig.gyro_lowpass2_hz,0);
 
-        if (activeSysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(activeSysConfig.firmwareVersion, '4.3.0')) {
+        if ((activeSysConfig.firmwareType  === FIRMWARE_TYPE_BETAFLIGHT || activeSysConfig.firmwareType  === FIRMWARE_TYPE_INDIFLIGHT)  && semver.gte(activeSysConfig.firmwareVersion, '4.3.0')) {
             setParameter('dynNotchCount'           ,sysConfig.dyn_notch_count        , 0);
         } else {
             setParameter('dynNotchCount'           ,sysConfig.dyn_notch_width_percent, 0);
@@ -698,7 +699,7 @@ function HeaderDialog(dialog, onSave) {
         setParameter('rcSmoothingRxAverage'         ,sysConfig.rc_smoothing_rx_average, 3);
         renderSelect('rcSmoothingDebugAxis'         ,sysConfig.rc_smoothing_debug_axis, RC_SMOOTHING_DEBUG_AXIS);
 
-        if (activeSysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT && semver.gte(activeSysConfig.firmwareVersion, '4.3.0')) {
+        if ((activeSysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT || activeSysConfig.firmwareType === FIRMWARE_TYPE_INDIFLIGHT) && semver.gte(activeSysConfig.firmwareVersion, '4.3.0')) {
             renderSelect('rcSmoothingMode'              ,sysConfig.rc_smoothing_mode, RC_SMOOTHING_MODE);
             setParameter('rcSmoothingFeedforwardHz'     ,sysConfig.rc_smoothing_feedforward_hz, 0);
             setParameter('rcSmoothingSetpointHz'        ,sysConfig.rc_smoothing_setpoint_hz, 0);
@@ -708,7 +709,7 @@ function HeaderDialog(dialog, onSave) {
             setParameter('rcSmoothingActiveCutoffsFf'   ,sysConfig.rc_smoothing_active_cutoffs_ff_sp_thr[0], 0);
             setParameter('rcSmoothingActiveCutoffsSp'   ,sysConfig.rc_smoothing_active_cutoffs_ff_sp_thr[1], 0);
             setParameter('rcSmoothingActiveCutoffsThr'  ,sysConfig.rc_smoothing_active_cutoffs_ff_sp_thr[2], 0);
-        } else if (activeSysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT && semver.gte(activeSysConfig.firmwareVersion, '3.4.0')) {
+        } else if ((activeSysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT || activeSysConfig.firmwareType === FIRMWARE_TYPE_INDIFLIGHT) && semver.gte(activeSysConfig.firmwareVersion, '3.4.0')) {
             renderSelect('rcSmoothingMode'              ,sysConfig.rc_smoothing_mode, RC_SMOOTHING_TYPE);
             setParameter('rcSmoothingFeedforwardHz'     ,sysConfig.rc_smoothing_cutoffs[0], 0);
             setParameter('rcSmoothingSetpointHz'        ,sysConfig.rc_smoothing_cutoffs[1], 0);
@@ -731,7 +732,7 @@ function HeaderDialog(dialog, onSave) {
        }
 
         // D_MIN and rate_limits
-        if (activeSysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(activeSysConfig.firmwareVersion, '4.0.0')) {
+        if ((activeSysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT || activeSysConfig.firmwareType === FIRMWARE_TYPE_INDIFLIGHT)  && semver.gte(activeSysConfig.firmwareVersion, '4.0.0')) {
             setParameter('d_min_roll'   , sysConfig.d_min[0]     , 0);
             setParameter('d_min_pitch'  , sysConfig.d_min[1]     , 0);
             setParameter('d_min_yaw'    , sysConfig.d_min[2]     , 0);
@@ -762,7 +763,7 @@ function HeaderDialog(dialog, onSave) {
         setParameter('ptermSRateWeight'			,sysConfig.ptermSRateWeight,2);
         setParameter('dtermSetpointWeight'		,sysConfig.dtermSetpointWeight,2);
 
-        if(activeSysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT && semver.gte(activeSysConfig.firmwareVersion, '4.3.0')) {
+        if((activeSysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT || activeSysConfig.firmwareType === FIRMWARE_TYPE_INDIFLIGHT) && semver.gte(activeSysConfig.firmwareVersion, '4.3.0')) {
             renderSelect('feedforwardAveraging'  ,sysConfig.ff_averaging, FF_AVERAGING);
             setParameter('feedforwardSmoothing'  ,sysConfig.ff_smooth_factor,0);
             setParameter('feedforwardJitter'     ,sysConfig.ff_jitter_factor,0);
@@ -777,7 +778,7 @@ function HeaderDialog(dialog, onSave) {
         setParameter('feedforwardBoost'         ,sysConfig.ff_boost,0);
 
         setParameter('abs_control_gain'         ,sysConfig.abs_control_gain, 0);
-        if(activeSysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT && semver.gte(activeSysConfig.firmwareVersion, '3.1.0')) {
+        if((activeSysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT || activeSysConfig.firmwareType === FIRMWARE_TYPE_INDIFLIGHT) && semver.gte(activeSysConfig.firmwareVersion, '3.1.0')) {
             setParameterFloat('yawRateAccelLimit', sysConfig.yawRateAccelLimit, 2);
             setParameterFloat('rateAccelLimit'   , sysConfig.rateAccelLimit, 2);
         } else {
@@ -791,7 +792,7 @@ function HeaderDialog(dialog, onSave) {
 		setParameter('motorOutputHigh'			,sysConfig.motorOutput[1],0);
 		setParameter('digitalIdleOffset'		,sysConfig.digitalIdleOffset,2);
         renderSelect('antiGravityMode'          ,sysConfig.anti_gravity_mode, ANTI_GRAVITY_MODE);
-        if((activeSysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(activeSysConfig.firmwareVersion, '3.1.0')) ||
+        if(((activeSysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT || activeSysConfig.firmwareType === FIRMWARE_TYPE_INDIFLIGHT)  && semver.gte(activeSysConfig.firmwareVersion, '3.1.0')) ||
                 (activeSysConfig.firmwareType == FIRMWARE_TYPE_CLEANFLIGHT && semver.gte(activeSysConfig.firmwareVersion, '2.0.0'))) {
             setParameter('antiGravityGain'      ,sysConfig.anti_gravity_gain,3);
         } else {
@@ -838,7 +839,7 @@ function HeaderDialog(dialog, onSave) {
 
 
         // Dynamic filters of Betaflight 4.0
-        if(activeSysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(activeSysConfig.firmwareVersion, '4.0.0') &&
+        if((activeSysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT || activeSysConfig.firmwareType === FIRMWARE_TYPE_INDIFLIGHT)  && semver.gte(activeSysConfig.firmwareVersion, '4.0.0') &&
                 (sysConfig.gyro_lowpass_dyn_hz[0] != null) && (sysConfig.gyro_lowpass_dyn_hz[0] > 0) &&
                 (sysConfig.gyro_lowpass_dyn_hz[1] > sysConfig.gyro_lowpass_dyn_hz[0])) {
             renderSelect('gyro_soft_dyn_type', sysConfig.gyro_soft_type, FILTER_TYPE);
@@ -852,7 +853,7 @@ function HeaderDialog(dialog, onSave) {
             $('.parameter td[name="gyro_soft_dyn_max_hz"]').css('display', 'none');
         }
 
-        if(activeSysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(activeSysConfig.firmwareVersion, '4.0.0') &&
+        if((activeSysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT || activeSysConfig.firmwareType === FIRMWARE_TYPE_INDIFLIGHT)  && semver.gte(activeSysConfig.firmwareVersion, '4.0.0') &&
                 (sysConfig.dterm_lpf_dyn_hz[0] != null) && (sysConfig.dterm_lpf_dyn_hz[0] > 0) &&
                 (sysConfig.dterm_lpf_dyn_hz[1] > sysConfig.dterm_lpf_dyn_hz[0])) {
             renderSelect('dterm_dyn_type', sysConfig.dterm_filter_type, FILTER_TYPE);
@@ -887,7 +888,7 @@ function HeaderDialog(dialog, onSave) {
         setCheckbox('rc_smoothing'				,sysConfig.rc_smoothing);
 
         /* Selected Fields */
-        if(activeSysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT && semver.gte(activeSysConfig.firmwareVersion, '4.3.0')) {
+        if((activeSysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT || activeSysConfig.firmwareType === FIRMWARE_TYPE_INDIFLIGHT) && semver.gte(activeSysConfig.firmwareVersion, '4.3.0')) {
             builtSelectedFieldsList(sysConfig);
             $(".disabled_fields").css("display","table-header-group");
         } else {
@@ -898,7 +899,7 @@ function HeaderDialog(dialog, onSave) {
         renderUnknownHeaders(sysConfig.unknownHeaders);
 
         /* Remove some version specific headers */
-        if(activeSysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT && semver.gte(activeSysConfig.firmwareVersion, '3.1.0')) {
+        if((activeSysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT || activeSysConfig.firmwareType === FIRMWARE_TYPE_INDIFLIGHT) && semver.gte(activeSysConfig.firmwareVersion, '3.1.0')) {
             $(".BFPIDController").css("display","none");
         } else {
             $(".BFPIDController").css("display","table-header-group");

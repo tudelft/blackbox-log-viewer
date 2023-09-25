@@ -120,6 +120,44 @@ function GraphConfig(graphConfig) {
                 }
             }
 
+            var graphMatched = undefined;
+            var homogeneous = false;
+            var inMax=+1.;
+            var inMin=-1.;
+            for (var j = 0; j < newGraph.fields.length; j++) {
+                var 
+                    field = newGraph.fields[j],
+                    matches = field.name.match(/^(.+)\[.+$/),
+                    match;
+                if (!matches) {
+                    continue;
+                }
+                match = matches[1];
+                if ((graphMatched) && (graphMatched !== match)) { 
+                    homogeneous = false;
+                    break;
+                } else {
+                    homogeneous = true;
+                    graphMatched = match;
+                    inMax = Math.max(inMax,-field.curve.offset + field.curve.inputRange);
+                    inMin = Math.min(inMin,-field.curve.offset - field.curve.inputRange);
+                }
+            }
+            if (homogeneous) {
+                console.log(`it happened ${newGraph.label}`);
+                // all plots have the same stem, so plot them on a common scale
+                // representing their envelope
+                var 
+                    offset = -(inMax + inMin) / 2,
+                    inputRange = (inMax - inMin) / 2 * 1.05; // protection against 0 not necessary
+                for (var j = 0; j < newGraph.fields.length; j++) {
+                    console.log(`Min ${-newGraph.fields[j].curve.offset - newGraph.fields[j].curve.inputRange} to ${-offset - inputRange}`);
+                    console.log(`Max ${-newGraph.fields[j].curve.offset + newGraph.fields[j].curve.inputRange} to ${-offset + inputRange}`);
+                    newGraph.fields[j].curve.offset = offset;
+                    newGraph.fields[j].curve.inputRange = inputRange;
+                }
+            }
+
             newGraphs.push(newGraph);
         }
 

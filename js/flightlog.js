@@ -658,7 +658,7 @@ function FlightLog(logData) {
                     var fieldIndexRcCommands = fieldIndex;
 
                     // Since version 4.0 is not more a virtual field. Copy the real field to the virtual one to maintain the name, workspaces, etc.
-                    if (sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(sysConfig.firmwareVersion, '4.0.0')) {
+                    if ((sysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT || sysConfig.firmwareType === FIRMWARE_TYPE_INDIFLIGHT)  && semver.gte(sysConfig.firmwareVersion, '4.0.0')) {
                         // Roll, pitch and yaw
                         for (var axis = 0; axis <= AXIS.YAW; axis++) {
                             destFrame[fieldIndex++] = srcFrame[setpoint[axis]];
@@ -1006,7 +1006,10 @@ function FlightLog(logData) {
      * Attempt to open the log with the given index, returning true on success.
      */
     this.openLog = function(index) {
-        if (this.getLogError(index)) {
+        var 
+            e = this.getLogError(index);
+        if (e) {
+            console.log(`getLogError: ${e}`);
             return false;
         }
 
@@ -1022,6 +1025,7 @@ function FlightLog(logData) {
         // Hide the header button if we are not using betaflight
         switch (this.getSysConfig().firmwareType) {
             case FIRMWARE_TYPE_BETAFLIGHT:
+            case FIRMWARE_TYPE_INDIFLIGHT:
             case FIRMWARE_TYPE_INAV:
                 $(".open-header-dialog").show()
                 break;
@@ -1225,9 +1229,9 @@ FlightLog.prototype.getPIDPercentage = function(value) {
 
 
 FlightLog.prototype.getReferenceVoltageMillivolts = function() {
-    if(this.getSysConfig().firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(this.getSysConfig().firmwareVersion, '4.0.0')) {
+    if((this.getSysConfig().firmwareType === FIRMWARE_TYPE_BETAFLIGHT || this.getSysConfig().firmwareType === FIRMWARE_TYPE_INDIFLIGHT)  && semver.gte(this.getSysConfig().firmwareVersion, '4.0.0')) {
         return this.getSysConfig().vbatref * 10;
-    } else if((this.getSysConfig().firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(this.getSysConfig().firmwareVersion, '3.1.0')) ||
+    } else if(((this.getSysConfig().firmwareType === FIRMWARE_TYPE_BETAFLIGHT || this.getSysConfig().firmwareType === FIRMWARE_TYPE_INDIFLIGHT)  && semver.gte(this.getSysConfig().firmwareVersion, '3.1.0')) ||
        (this.getSysConfig().firmwareType == FIRMWARE_TYPE_CLEANFLIGHT && semver.gte(this.getSysConfig().firmwareVersion, '2.0.0'))) {
         return this.getSysConfig().vbatref * 100;
     } else {

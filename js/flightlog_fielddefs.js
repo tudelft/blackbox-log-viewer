@@ -100,6 +100,7 @@ let
         'RANGEFINDER',
         'FAILSAFE',
         'GPSRESCUE',
+        'POSITION',
         'ANTIGRAVITY',
         'HEADADJ',
         'CAMSTAB',
@@ -523,7 +524,7 @@ let
     ]);
 
 function adjustFieldDefsList(firmwareType, firmwareVersion) {
-    if (firmwareType === FIRMWARE_TYPE_BETAFLIGHT && semver.gte(firmwareVersion, '3.3.0')) {
+    if ((firmwareType === FIRMWARE_TYPE_BETAFLIGHT && semver.gte(firmwareVersion, '3.3.0')) || (firmwareType === FIRMWARE_TYPE_INDIFLIGHT)) {
 
         // Debug names
         DEBUG_MODE = DEBUG_MODE_COMPLETE.slice(0);
@@ -567,6 +568,10 @@ function adjustFieldDefsList(firmwareType, firmwareVersion) {
             FLIGHT_LOG_FLIGHT_MODE_NAME.splice(FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf('BARO'),    1);
             FLIGHT_LOG_FLIGHT_MODE_NAME.splice(FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf('GPSHOME'), 1);
             FLIGHT_LOG_FLIGHT_MODE_NAME.splice(FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf('GPSHOLD'), 1);
+        }
+        //if (semver.lt(firmwareVersion, '4.4.2')) {
+        if (firmwareType !== FIRMWARE_TYPE_INDIFLIGHT) {
+            FLIGHT_LOG_FLIGHT_MODE_NAME.splice(FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf('POSITION'), 1);
         }
         FLIGHT_LOG_FLIGHT_MODE_NAME = makeReadOnly(FLIGHT_LOG_FLIGHT_MODE_NAME);
 

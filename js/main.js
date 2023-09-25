@@ -592,6 +592,7 @@ function BlackboxLogViewer() {
         try {
             if (logIndex === null) {
                 for (var i = 0; i < flightLog.getLogCount(); i++) {
+                    //console.log(`Opening log ${i}`);
                     if (flightLog.openLog(i)) {
                         success = true;
                         currentOffsetCache.index = i;

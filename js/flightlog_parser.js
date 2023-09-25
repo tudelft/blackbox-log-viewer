@@ -6,7 +6,8 @@ var FlightLogIndex,
     FIRMWARE_TYPE_BASEFLIGHT = 1,
     FIRMWARE_TYPE_CLEANFLIGHT = 2,
     FIRMWARE_TYPE_BETAFLIGHT = 3,
-    FIRMWARE_TYPE_INAV = 4;
+    FIRMWARE_TYPE_INAV = 4,
+    FIRMWARE_TYPE_INDIFLIGHT = 5;
 
 var FlightLogParser = function(logData) {
     //Private constants:
@@ -767,7 +768,7 @@ var FlightLogParser = function(logData) {
 
             case "yawRateAccelLimit":
             case "rateAccelLimit":
-                if((that.sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(that.sysConfig.firmwareVersion, '3.1.0')) ||
+                if(((that.sysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT || that.sysConfig.firmwareType === FIRMWARE_TYPE_INDIFLIGHT)  && semver.gte(that.sysConfig.firmwareVersion, '3.1.0')) ||
                    (that.sysConfig.firmwareType == FIRMWARE_TYPE_CLEANFLIGHT && semver.gte(that.sysConfig.firmwareVersion, '2.0.0'))) {
                     that.sysConfig[fieldName] = parseInt(fieldValue, 10)/1000;
                 } else {
@@ -782,7 +783,7 @@ var FlightLogParser = function(logData) {
             case "dterm_notch_cutoff":
             case "dterm_lpf_hz":
             case "dterm_lpf2_hz":
-                if((that.sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(that.sysConfig.firmwareVersion, '3.0.1')) ||
+                if(((that.sysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT || that.sysConfig.firmwareType === FIRMWARE_TYPE_INDIFLIGHT)  && semver.gte(that.sysConfig.firmwareVersion, '3.0.1')) ||
                    (that.sysConfig.firmwareType == FIRMWARE_TYPE_CLEANFLIGHT && semver.gte(that.sysConfig.firmwareVersion, '2.0.0'))) {
                     that.sysConfig[fieldName] = parseInt(fieldValue, 10);
                 } else {
@@ -792,7 +793,7 @@ var FlightLogParser = function(logData) {
 
             case "gyro_notch_hz":
             case "gyro_notch_cutoff":
-                if((that.sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(that.sysConfig.firmwareVersion, '3.0.1')) ||
+                if(((that.sysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT || that.sysConfig.firmwareType === FIRMWARE_TYPE_INDIFLIGHT)  && semver.gte(that.sysConfig.firmwareVersion, '3.0.1')) ||
                    (that.sysConfig.firmwareType == FIRMWARE_TYPE_CLEANFLIGHT && semver.gte(that.sysConfig.firmwareVersion, '2.0.0'))) {
                     that.sysConfig[fieldName] = parseCommaSeparatedString(fieldValue);
                 } else {
@@ -884,7 +885,8 @@ var FlightLogParser = function(logData) {
                      * match Baseflight so we can use Baseflight's IMU for both: */
                     if (that.sysConfig.firmwareType == FIRMWARE_TYPE_INAV ||
                         that.sysConfig.firmwareType == FIRMWARE_TYPE_CLEANFLIGHT ||
-                        that.sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT) {
+                        that.sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT ||
+                        that.sysConfig.firmwareType == FIRMWARE_TYPE_INDIFLIGHT) {
                         that.sysConfig.gyroScale = that.sysConfig.gyroScale * (Math.PI / 180.0) * 0.000001;
                     }
             break;
@@ -897,12 +899,23 @@ var FlightLogParser = function(logData) {
                 if(matches!=null) {
 
                     // Detecting Betaflight requires looking at the revision string
-                    if (matches[1] === "Betaflight") {
-                        that.sysConfig.firmwareType = FIRMWARE_TYPE_BETAFLIGHT;
-                        $('html').removeClass('isBaseF');
-                        $('html').removeClass('isCF');
-                        $('html').addClass('isBF');
-                        $('html').removeClass('isINAV');
+                    switch(matches[1]) {
+                        case "Betaflight":
+                            that.sysConfig.firmwareType = FIRMWARE_TYPE_BETAFLIGHT;
+                            $('html').removeClass('isBaseF');
+                            $('html').removeClass('isCF');
+                            $('html').addClass('isBF');
+                            $('html').removeClass('isINAV');
+                            break;
+                        case "Indiflight":
+                            // todo: figure out what these classes are
+                            that.sysConfig.firmwareType = FIRMWARE_TYPE_INDIFLIGHT;
+                            $('html').removeClass('isBaseF');
+                            $('html').removeClass('isCF');
+                            $('html').addClass('isBF');
+                            $('html').removeClass('isINAV');
+                            break;
+                        default:
                     }
 
                     that.sysConfig.firmware        = parseFloat(matches[2] + '.' + matches[3]).toFixed(1);
@@ -1605,6 +1618,7 @@ var FlightLogParser = function(logData) {
     }
 
     this.parseHeader = function(startOffset, endOffset) {
+        //console.log(`parsing header`);
         this.resetAllState();
 
         //Set parsing ranges up
@@ -1684,6 +1698,7 @@ var FlightLogParser = function(logData) {
         } else {
             lastSlow = [];
         }
+        //console.log(`done parsing header`);
     };
 
     /**
@@ -1736,6 +1751,7 @@ var FlightLogParser = function(logData) {
 
                 // Is this the beginning of a new frame?
                 looksLikeFrameCompleted = getFrameType(command) || (!prematureEof && command == EOF);
+                //console.log(`looksLikeFrameCompleted = ${getFrameType(command)} (getFrameType(${command})) || (${!prematureEof} && ${command == EOF})`)
 
                 if (!this.stats.frame[lastFrameType.marker]) {
                     this.stats.frame[lastFrameType.marker] = {
@@ -1766,6 +1782,7 @@ var FlightLogParser = function(logData) {
                     }
                 } else {
                     //The previous frame was corrupt
+                    //console.log(`prev frame corrupted. ${lastFrameSize} <= ${FLIGHT_LOG_MAX_FRAME_LENGTH} && ${looksLikeFrameCompleted}`);
 
                     //We need to resynchronise before we can deliver another main frame:
                     mainStreamIsValid = false;
