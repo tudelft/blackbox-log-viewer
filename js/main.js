@@ -74,7 +74,7 @@ function BlackboxLogViewer() {
         graphLegend = null,
         workspaceSelection = null,
         fieldPresenter = FlightLogFieldPresenter,
-        
+
         hasVideo = false, hasLog = false, hasMarker = false, // add measure feature
         hasTable = true, hasAnalyser, hasMap, hasAnalyserFullscreen,
         hasAnalyserSticks = false, viewVideo = true, hasTableOverlay = false, hadTable,
@@ -1424,6 +1424,11 @@ function BlackboxLogViewer() {
             },
 
             function(newSettings) { // onSave
+                var redraw = false;
+                if (userSettings.onlyAutoScaling != newSettings.onlyAutoScaling) {
+                    redraw = true;
+                }
+
 	            userSettings = newSettings;
 
 	            prefs.set('userSettings', newSettings);
@@ -1438,6 +1443,13 @@ function BlackboxLogViewer() {
                     }
 	                updateCanvasSize();
 	            }
+
+                // refresh plots if necessary
+                if (redraw) {
+                    activeGraphConfig.adaptGraphs(flightLog, graphConfig);
+
+                    prefs.set('graphConfig', graphConfig);
+                }
 
 	        }),
 

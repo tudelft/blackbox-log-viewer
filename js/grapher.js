@@ -800,8 +800,13 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
                     
                     drawAxisBottomLine(canvas.height * graph.height / 2);
 
-                    var settings = graph.fields[0].curve.getCurve();
-                    drawAxisZeroLine(-settings.offset / settings.inputRange * canvas.height * graph.height / 2);
+                    if (graph.commonOffset) {
+                        // take first field at will, it doesnt matter and 
+                        // commonOffset is only true if there is at least one 
+                        // field
+                        var settings = graph.fields[0].curve.getCurve();
+                        drawAxisZeroLine(-settings.offset / settings.inputRange * canvas.height * graph.height / 2);
+                    }
 
                     if(!options.graphGridOverride) {
                         for (j = 0; j < graph.fields.length; j++) {
