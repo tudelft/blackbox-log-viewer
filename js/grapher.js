@@ -395,13 +395,26 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
     }
     
     //Draw an origin line for a graph (at the origin and spanning the window)
-    function drawAxisLine() {
+    function drawAxisBottomLine(plotHeight) {
         canvasContext.strokeStyle = "rgba(255,255,255,0.5)";
+        canvasContext.lineWidth = 1;
+		//canvasContext.setLineDash([5]); // Make the center line a dash        
+        canvasContext.beginPath();
+        canvasContext.moveTo(0, plotHeight);
+        canvasContext.lineTo(canvas.width, plotHeight);
+        
+        canvasContext.stroke();
+		//canvasContext.setLineDash([]);        
+    }
+
+    //Draw the zero line for a graph
+    function drawAxisZeroLine(zeroHeight) {
+        canvasContext.strokeStyle = "rgba(255,255,255,0.3)";
         canvasContext.lineWidth = 1;
 		canvasContext.setLineDash([5]); // Make the center line a dash        
         canvasContext.beginPath();
-        canvasContext.moveTo(0, 0);
-        canvasContext.lineTo(canvas.width, 0);
+        canvasContext.moveTo(0, zeroHeight);
+        canvasContext.lineTo(canvas.width, zeroHeight);
         
         canvasContext.stroke();
 		canvasContext.setLineDash([]);        
@@ -785,7 +798,15 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
                 {
                     canvasContext.translate(0, canvas.height * graph.y);
                     
-                    drawAxisLine();
+                    drawAxisBottomLine(canvas.height * graph.height / 2);
+
+                    if (graph.commonOffset) {
+                        // take first field at will, it doesnt matter and 
+                        // commonOffset is only true if there is at least one 
+                        // field
+                        var settings = graph.fields[0].curve.getCurve();
+                        drawAxisZeroLine(-settings.offset / settings.inputRange * canvas.height * graph.height / 2);
+                    }
 
                     if(!options.graphGridOverride) {
                         for (j = 0; j < graph.fields.length; j++) {
@@ -808,7 +829,7 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
                     }
                     
                     if (graph.label) {
-                        drawAxisLabel(graph.label);
+                        drawAxisLabel(graph.label, -canvas.height * graph.height / 2 + 16);
                     }
                 }
                 canvasContext.restore();

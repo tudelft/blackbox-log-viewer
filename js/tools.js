@@ -442,9 +442,9 @@ function firmwareGreaterOrEqual(sysConfig, bf_version, cf_version) {
      *                      False when firmware version is lower than the requested version
      ***/
     if (cf_version === undefined) {
-        return (sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT && semver.gte(sysConfig.firmwareVersion, bf_version));
+        return ((sysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT || sysConfig.firmwareType === FIRMWARE_TYPE_INDIFLIGHT) && semver.gte(sysConfig.firmwareVersion, bf_version));
     } else {
-        return (sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(sysConfig.firmwareVersion, bf_version)) || 
+        return ((sysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT || sysConfig.firmwareType === FIRMWARE_TYPE_INDIFLIGHT) && semver.gte(sysConfig.firmwareVersion, bf_version)) || 
                (sysConfig.firmwareType == FIRMWARE_TYPE_CLEANFLIGHT && semver.gte(sysConfig.firmwareVersion, cf_version));
     }
 }

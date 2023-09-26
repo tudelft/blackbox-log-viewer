@@ -1031,7 +1031,7 @@ function FlightLogFieldPresenter() {
 
         DEBUG_FRIENDLY_FIELD_NAMES = {...DEBUG_FRIENDLY_FIELD_NAMES_INITIAL};
 
-        if (firmwareType === FIRMWARE_TYPE_BETAFLIGHT) {
+        if (firmwareType === FIRMWARE_TYPE_BETAFLIGHT || firmwareType === FIRMWARE_TYPE_INDIFLIGHT) {
             if (semver.gte(firmwareVersion, '4.4.0')) {
                 DEBUG_FRIENDLY_FIELD_NAMES.BARO = {
                     'debug[all]':'Debug Barometer',
@@ -1349,9 +1349,9 @@ function FlightLogFieldPresenter() {
                 return flightLog.accRawToGs(value).toFixed(2 + highResolutionAddPrecision) + " g";
 
             case 'vbatLatest':
-                if (flightLog.getSysConfig().firmwareType === FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(flightLog.getSysConfig().firmwareVersion, '4.0.0')) {
+                if ((flightLog.getSysConfig().firmwareType === FIRMWARE_TYPE_BETAFLIGHT || flightLog.getSysConfig().firmwareType === FIRMWARE_TYPE_INDIFLIGHT)  && semver.gte(flightLog.getSysConfig().firmwareVersion, '4.0.0')) {
                     return (value / 100).toFixed(2) + "V" + ", " + (value / 100 / flightLog.getNumCellsEstimate()).toFixed(2) + " V/cell";
-                } else if ((flightLog.getSysConfig().firmwareType === FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(flightLog.getSysConfig().firmwareVersion, '3.1.0')) ||
+                } else if (((flightLog.getSysConfig().firmwareType === FIRMWARE_TYPE_BETAFLIGHT || flightLog.getSysConfig().firmwareType === FIRMWARE_TYPE_INDIFLIGHT)  && semver.gte(flightLog.getSysConfig().firmwareVersion, '3.1.0')) ||
                    (flightLog.getSysConfig().firmwareType === FIRMWARE_TYPE_CLEANFLIGHT && semver.gte(flightLog.getSysConfig().firmwareVersion, '2.0.0'))) {
                     return (value / 10).toFixed(2) + "V" + ", " + (value / 10 / flightLog.getNumCellsEstimate()).toFixed(2) + " V/cell";
                 } else {
@@ -1359,10 +1359,10 @@ function FlightLogFieldPresenter() {
                 }
 
             case 'amperageLatest':
-                if ((flightLog.getSysConfig().firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(flightLog.getSysConfig().firmwareVersion, '3.1.7')) ||
+                if (((flightLog.getSysConfig().firmwareType === FIRMWARE_TYPE_BETAFLIGHT || flightLog.getSysConfig().firmwareType === FIRMWARE_TYPE_INDIFLIGHT)  && semver.gte(flightLog.getSysConfig().firmwareVersion, '3.1.7')) ||
                    (flightLog.getSysConfig().firmwareType == FIRMWARE_TYPE_CLEANFLIGHT && semver.gte(flightLog.getSysConfig().firmwareVersion, '2.0.0'))) {
                        return (value / 100).toFixed(2) + "A" + ", " + (value / 100 / flightLog.getNumMotors()).toFixed(2) + " A/motor";
-                } else if (flightLog.getSysConfig().firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(flightLog.getSysConfig().firmwareVersion, '3.1.0')) {
+                } else if ((flightLog.getSysConfig().firmwareType === FIRMWARE_TYPE_BETAFLIGHT || flightLog.getSysConfig().firmwareType === FIRMWARE_TYPE_INDIFLIGHT)  && semver.gte(flightLog.getSysConfig().firmwareVersion, '3.1.0')) {
                     return (value / 100).toFixed(2) + "A" + ", " + (value / 100 / flightLog.getNumMotors()).toFixed(2) + " A/motor";
                 } else {
                     return (flightLog.amperageADCToMillivolts(value) / 1000).toFixed(2) + "A" + ", " + (flightLog.amperageADCToMillivolts(value) / 1000 / flightLog.getNumMotors()).toFixed(2) + " A/motor";
@@ -1421,8 +1421,95 @@ function FlightLogFieldPresenter() {
             case 'debug[7]':
                 return FlightLogFieldPresenter.decodeDebugFieldToFriendly(flightLog, fieldName, value, currentFlightMode);
 
+            case 'quat[0]':
+            case 'quat[1]':
+            case 'quat[2]':
+            case 'quat[3]':
+            case 'quatSp[0]':
+            case 'quatSp[1]':
+            case 'quatSp[2]':
+            case 'quatSp[3]':
+            case 'u[0]':
+            case 'u[1]':
+            case 'u[2]':
+            case 'u[3]':
+            case 'u[4]':
+            case 'u[5]':
+            case 'u[6]':
+            case 'u[7]':
+            case 'u_state[0]':
+            case 'u_state[1]':
+            case 'u_state[2]':
+            case 'u_state[3]':
+            case 'u_state[4]':
+            case 'u_state[5]':
+            case 'u_state[6]':
+            case 'u_state[7]':
+                return `${(value/8127).toFixed(3)}`;
+
+            case 'dv[0]':
+            case 'dv[1]':
+            case 'dv[2]':
+                return `${(value/10).toFixed(1)} N/kg`;
+
+            case 'dv[3]':
+            case 'dv[4]':
+            case 'dv[5]':
+                return `${(value/10).toFixed(1)} Nm/(kgm^2)`;
+
+            case 'alpha[0]':
+            case 'alpha[1]':
+            case 'alpha[2]':
+            case 'alphaSp[0]':
+            case 'alphaSp[1]':
+            case 'alphaSp[2]':
+                return `${(value).toFixed(0)} °/s/s`;
+
+            case 'spfSp[0]':
+            case 'spfSp[1]':
+            case 'spfSp[2]':
+                return `${(value/100).toFixed(2)} N/kg`;
+
+            case 'gyroSp[0]':
+            case 'gyroSp[1]':
+            case 'gyroSp[2]':
+                return `${(value).toFixed(0)} °/s`;
+
+            case 'omega[0]':
+            case 'omega[1]':
+            case 'omega[2]':
+            case 'omega[3]':
+            case 'omega[4]':
+            case 'omega[5]':
+            case 'omega[6]':
+            case 'omega[7]':
+                return `${(value).toFixed(0)} rad/s`;
+
+            case 'omega_dot[0]':
+            case 'omega_dot[1]':
+            case 'omega_dot[2]':
+            case 'omega_dot[3]':
+            case 'omega_dot[4]':
+            case 'omega_dot[5]':
+            case 'omega_dot[6]':
+            case 'omega_dot[7]':
+                return `${(value*100).toFixed(0)} rad/s/s`;
+
+            case 'pos[0]':
+            case 'pos[1]':
+            case 'pos[2]':
+            case 'posSp[0]':
+            case 'posSp[1]':
+            case 'posSp[2]':
+                return `${(value/1000).toFixed(3)} m`;
+
+            case 'vel[0]':
+            case 'vel[1]':
+            case 'vel[2]':
+                return `${(value/100).toFixed(2)} m/s`;
+
             default:
-                return "";
+                return `${(value)} raw units`;
         }
     };
 

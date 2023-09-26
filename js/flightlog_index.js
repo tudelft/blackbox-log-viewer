@@ -114,7 +114,9 @@ function FlightLogIndex(logData) {
                 }
                 
                 parser.onFrameReady = function(frameValid, frame, frameType, frameOffset, frameSize) {
+                    //console.log(`New frame ${frameType}. Frame: ${frame}`);
                     if (!frameValid) {
+                        //console.log(`Invalid frame`);
                         return;
                     }
                     

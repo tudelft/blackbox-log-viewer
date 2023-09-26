@@ -58,6 +58,8 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 		drawLapTimer		: false,			// Show Laptimer on display?
 		drawGradient		: false,			// Show Gradient on display?
 		drawVerticalBar		: true,				// Show vertical timebar on display?
+		onlyAutoScaling		: true,             // Use min/max based scaling of axes everywhere
+		useOnboardAttitude  : true,             // Use onboard attitude quat if available
         graphSmoothOverride : true,             // Ability to toggle Smoothing off=normal/ on=force 0%
         graphExpoOverride   : true,             // Ability to toggle Expo off=normal/ on=force 100%
         graphGridOverride   : true,             // Ability to toggle Grid off=normal/ on=force disabled
@@ -150,6 +152,8 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 				drawLapTimer: ($(".laptimer").is(":checked")),
 				drawGradient: ($(".gradient").is(":checked")),
 				drawVerticalBar: ($(".verticalBar").is(":checked")),
+				onlyAutoScaling: ($(".autoScaling").is(":checked")),
+				useOnboardAttitude: ($(".loggedAttitude").is(":checked")),
     	});
     	return settings;
     }
@@ -324,6 +328,14 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
         currentSettings.altitudeUnits = parseInt($(this).val());
     });
 
+    $(".autoScaling").click(function() {
+        currentSettings.onlyAutoScaling = $(this).is(":checked");
+    });
+
+    $(".loggedAttitude").click(function() {
+        currentSettings.useOnboardAttitude = $(this).is(":checked");
+    });
+
     // Load Custom Logo
     function readURL(input) {
         if (input.files && input.files[0]) {
@@ -459,6 +471,16 @@ function UserSettingsDialog(dialog, onLoad, onSave) {
 			if (currentSettings.drawVerticalBar != null) {
 				// set the toggle switch
 				$(".verticalBar").prop('checked', currentSettings.drawVerticalBar);
+			}
+
+			if (currentSettings.onlyAutoScaling != null) {
+				// set the toggle switch
+				$(".autoScaling").prop('checked', currentSettings.onlyAutoScaling);
+			}
+
+			if (currentSettings.useOnboardAttitude != null) {
+				// set the toggle switch
+				$(".loggedAttitude").prop('checked', currentSettings.useOnboardAttitude);
 			}
 
             dialog.modal('show');

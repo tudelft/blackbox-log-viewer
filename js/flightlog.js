@@ -83,11 +83,16 @@ function FlightLog(logData) {
         var
             rawStats = getRawStats(logIndex);
 
+        // get max/min of I and P frames
+        rawStats.field = rawStats.frame.I.field;
+        for (var j = 0; j < rawStats.frame.P.field.length; j++) {
+            rawStats.field[j].max = Math.max(rawStats.field[j].max, rawStats.frame.P.field[j].max);
+            rawStats.field[j].min = Math.min(rawStats.field[j].min, rawStats.frame.P.field[j].min);
+        }
+
         // Just modify the raw stats variable to add this field, the parser won't mind the extra field appearing:
         if (rawStats.frame.S) {
-            rawStats.field = rawStats.frame.I.field.concat(rawStats.frame.S.field);
-        } else {
-            rawStats.field = rawStats.frame.I.field;
+            rawStats.field = rawStats.field.concat(rawStats.frame.S.field);
         }
 
         return rawStats;
@@ -618,13 +623,31 @@ function FlightLog(logData) {
                         fieldIndex = destFrame.length - ADDITIONAL_COMPUTED_FIELD_COUNT;
 
                     if (gyroADC) { //don't calculate attitude if no gyro data
-                        attitude = chunkIMU.updateEstimatedAttitude(
-                            [srcFrame[gyroADC[0]], srcFrame[gyroADC[1]], srcFrame[gyroADC[2]]],
-                            [srcFrame[accSmooth[0]], srcFrame[accSmooth[1]], srcFrame[accSmooth[2]]],
-                            srcFrame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME],
-                            sysConfig.acc_1G,
-                            sysConfig.gyroScale,
-                            magADC);
+                        if (fieldNameToIndex["quat[0]"] && userSettings.useOnboardAttitude) {
+                            let quat_scaler = 1./8127.;
+                            let quat_all = [fieldNameToIndex["quat[0]"], fieldNameToIndex["quat[1]"], fieldNameToIndex["quat[2]"], fieldNameToIndex["quat[3]"]];
+                            let quat = new THREE.Quaternion(
+                                quat_scaler * srcFrame[quat_all[1]],
+                                quat_scaler * srcFrame[quat_all[2]],
+                                quat_scaler * srcFrame[quat_all[3]],
+                                quat_scaler * srcFrame[quat_all[0]]
+                                );
+                            let euler = new THREE.Euler();
+                            euler.setFromQuaternion(quat, "ZYX");
+                            attitude = {
+                                roll: euler.x,
+                                pitch: -euler.y,
+                                heading: euler.z,
+                            };
+                        } else {
+                            attitude = chunkIMU.updateEstimatedAttitude(
+                                [srcFrame[gyroADC[0]], srcFrame[gyroADC[1]], srcFrame[gyroADC[2]]],
+                                [srcFrame[accSmooth[0]], srcFrame[accSmooth[1]], srcFrame[accSmooth[2]]],
+                                srcFrame[FlightLogParser.prototype.FLIGHT_LOG_FIELD_INDEX_TIME],
+                                sysConfig.acc_1G,
+                                sysConfig.gyroScale,
+                                magADC);
+                        }
 
                         destFrame[fieldIndex++] = attitude.roll;
                         destFrame[fieldIndex++] = attitude.pitch;
@@ -658,7 +681,7 @@ function FlightLog(logData) {
                     var fieldIndexRcCommands = fieldIndex;
 
                     // Since version 4.0 is not more a virtual field. Copy the real field to the virtual one to maintain the name, workspaces, etc.
-                    if (sysConfig.firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(sysConfig.firmwareVersion, '4.0.0')) {
+                    if ((sysConfig.firmwareType === FIRMWARE_TYPE_BETAFLIGHT || sysConfig.firmwareType === FIRMWARE_TYPE_INDIFLIGHT)  && semver.gte(sysConfig.firmwareVersion, '4.0.0')) {
                         // Roll, pitch and yaw
                         for (var axis = 0; axis <= AXIS.YAW; axis++) {
                             destFrame[fieldIndex++] = srcFrame[setpoint[axis]];
@@ -1006,7 +1029,10 @@ function FlightLog(logData) {
      * Attempt to open the log with the given index, returning true on success.
      */
     this.openLog = function(index) {
-        if (this.getLogError(index)) {
+        var 
+            e = this.getLogError(index);
+        if (e) {
+            console.log(`getLogError: ${e}`);
             return false;
         }
 
@@ -1022,6 +1048,7 @@ function FlightLog(logData) {
         // Hide the header button if we are not using betaflight
         switch (this.getSysConfig().firmwareType) {
             case FIRMWARE_TYPE_BETAFLIGHT:
+            case FIRMWARE_TYPE_INDIFLIGHT:
             case FIRMWARE_TYPE_INAV:
                 $(".open-header-dialog").show()
                 break;
@@ -1225,9 +1252,9 @@ FlightLog.prototype.getPIDPercentage = function(value) {
 
 
 FlightLog.prototype.getReferenceVoltageMillivolts = function() {
-    if(this.getSysConfig().firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(this.getSysConfig().firmwareVersion, '4.0.0')) {
+    if((this.getSysConfig().firmwareType === FIRMWARE_TYPE_BETAFLIGHT || this.getSysConfig().firmwareType === FIRMWARE_TYPE_INDIFLIGHT)  && semver.gte(this.getSysConfig().firmwareVersion, '4.0.0')) {
         return this.getSysConfig().vbatref * 10;
-    } else if((this.getSysConfig().firmwareType == FIRMWARE_TYPE_BETAFLIGHT  && semver.gte(this.getSysConfig().firmwareVersion, '3.1.0')) ||
+    } else if(((this.getSysConfig().firmwareType === FIRMWARE_TYPE_BETAFLIGHT || this.getSysConfig().firmwareType === FIRMWARE_TYPE_INDIFLIGHT)  && semver.gte(this.getSysConfig().firmwareVersion, '3.1.0')) ||
        (this.getSysConfig().firmwareType == FIRMWARE_TYPE_CLEANFLIGHT && semver.gte(this.getSysConfig().firmwareVersion, '2.0.0'))) {
         return this.getSysConfig().vbatref * 100;
     } else {

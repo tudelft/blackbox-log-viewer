@@ -110,6 +110,7 @@ function GraphConfigurationDialog(dialog, onSave) {
                     + '<td><input name="linewidth" class="form-control" type="text"/></td>'
                     + '<td><select class="color-picker"></select></td>'
                     + '<td><input name="grid" type="checkbox"/></td>'
+                    + '<td><input name="commonScale" type="checkbox"/></td>'
                     + '<td><button type="button" class="btn btn-default btn-sm"><span class="glyphicon glyphicon-trash"></span></button></td>'
                 + '</tr>'
             ),
@@ -129,6 +130,9 @@ function GraphConfigurationDialog(dialog, onSave) {
 
         // Set the grid state
         $('input[name=grid]',elem).attr("checked", (field.grid)?field.grid:false);
+
+        // Set the scale state
+        $('input[name=commonScale]',elem).attr("checked", (field.commonScale !== undefined)?field.commonScale:true);
 
         //Populate the Color Picker
         $('select.color-picker', elem).replaceWith(chooseColor(color));
@@ -187,6 +191,7 @@ function GraphConfigurationDialog(dialog, onSave) {
                                                     + '<th name="line">Line</th>'
                                                     + '<th name="color">Color</th>'
                                                     + '<th name="grid">Grid</th>'
+                                                    + '<th name="commonScale">Common Scale</th>'
                                                 + '</tr>'
                                             + '</thead>'
                                             + '<tbody>'
@@ -325,6 +330,7 @@ function GraphConfigurationDialog(dialog, onSave) {
                     color: $('select.color-picker option:selected', this).val(),
                     lineWidth: parseInt($("input[name=linewidth]", this).val()),
                     grid: $('input[name=grid]', this).is(':checked'),
+                    commonScale: $('input[name=commonScale]', this).is(':checked'),
                 };
                 
                 if (field.name.length > 0) {

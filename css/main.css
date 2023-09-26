@@ -448,6 +448,10 @@ html.has-log .log-graph-config {
     width: 25px;
 }
 
+.config-graph-field input[name=commonScale] {
+    width: 150px;
+}
+
 .config-graph-field select.form-control {
     padding-left: 2px;
     max-width: 150px;
