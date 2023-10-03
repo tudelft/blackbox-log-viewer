@@ -88,12 +88,14 @@ function FlightLog(logData) {
         for (var j = 0; j < rawStats.frame.P.field.length; j++) {
             rawStats.field[j].max = Math.max(rawStats.field[j].max, rawStats.frame.P.field[j].max);
             rawStats.field[j].min = Math.min(rawStats.field[j].min, rawStats.frame.P.field[j].min);
+            //console.log(`${fieldNames[j]}: min ${rawStats.field[j].min}, max ${rawStats.field[j].max}`);
         }
 
         // Just modify the raw stats variable to add this field, the parser won't mind the extra field appearing:
         if (rawStats.frame.S) {
             rawStats.field = rawStats.field.concat(rawStats.frame.S.field);
         }
+
 
         return rawStats;
     };

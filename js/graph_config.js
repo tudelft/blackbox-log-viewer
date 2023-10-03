@@ -122,14 +122,14 @@ function GraphConfig(graphConfig) {
             }
 
             var anyCommonScale = false;
-            var inMax=+1.;
-            var inMin=-1.;
+            var inMax=-Number.MAX_VALUE;
+            var inMin=+Number.MAX_VALUE;
             for (var j = 0; j < newGraph.fields.length; j++) {
                 var field = newGraph.fields[j];
                 if (field.commonScale) {
                     anyCommonScale = true;
-                    inMax = Math.max(inMax,-field.curve.offset + field.curve.inputRange);
                     inMin = Math.min(inMin,-field.curve.offset - field.curve.inputRange);
+                    inMax = Math.max(inMax,-field.curve.offset + field.curve.inputRange);
                 }
             }
 
@@ -142,10 +142,11 @@ function GraphConfig(graphConfig) {
                     inputRange = (inMax - inMin) / 2 * 1.05; // protection against 0 not necessary
                 for (var j = 0; j < newGraph.fields.length; j++) {
                     if (newGraph.fields[j].commonScale) {
-                        //console.log(`Min ${-newGraph.fields[j].curve.offset - newGraph.fields[j].curve.inputRange} to ${-offset - inputRange}`);
-                        //console.log(`Max ${-newGraph.fields[j].curve.offset + newGraph.fields[j].curve.inputRange} to ${-offset + inputRange}`);
+                        console.log(`${newGraph.fields[j].name}`)
+                        console.log(`Min ${-newGraph.fields[j].curve.offset - newGraph.fields[j].curve.inputRange} to ${-offset - inputRange}`);
+                        console.log(`Max ${-newGraph.fields[j].curve.offset + newGraph.fields[j].curve.inputRange} to ${-offset + inputRange}`);
                         newGraph.fields[j].curve.offset = offset;
-                        newGraph.fields[j].curve.inputRange = inputRange;
+                        newGraph.fields[j].curve.inputRange = Math.max(inputRange, 1.);
                     }
                 }
             }
@@ -260,7 +261,7 @@ GraphConfig.load = function(config) {
             var
                 stats = flightLog.getStats(),
                 min = Number.MAX_VALUE,
-                max = Number.MIN_VALUE;
+                max = -Number.MAX_VALUE;
 
             for(var i in arguments) {
                 var
@@ -273,7 +274,7 @@ GraphConfig.load = function(config) {
                 }
             }
 
-            if (min != Number.MAX_VALUE && max != Number.MIN_VALUE) {
+            if (min != Number.MAX_VALUE && max != -Number.MAX_VALUE) {
                 return {min:min, max:max};
             }
 

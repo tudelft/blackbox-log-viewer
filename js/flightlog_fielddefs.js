@@ -100,6 +100,7 @@ let
         'RANGEFINDER',
         'FAILSAFE',
         'GPSRESCUE',
+        'VELOCITY',
         'POSITION',
         'ANTIGRAVITY',
         'HEADADJ',
@@ -571,6 +572,7 @@ function adjustFieldDefsList(firmwareType, firmwareVersion) {
         }
         //if (semver.lt(firmwareVersion, '4.4.2')) {
         if (firmwareType !== FIRMWARE_TYPE_INDIFLIGHT) {
+            FLIGHT_LOG_FLIGHT_MODE_NAME.splice(FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf('VELOCITY'), 1);
             FLIGHT_LOG_FLIGHT_MODE_NAME.splice(FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf('POSITION'), 1);
         }
         FLIGHT_LOG_FLIGHT_MODE_NAME = makeReadOnly(FLIGHT_LOG_FLIGHT_MODE_NAME);
