@@ -1218,7 +1218,7 @@ function FlightLogFieldPresenter() {
         let eventState = '';
         let found = false;
 
-        for (let i = 0; i < flagNames.length; i++) {
+        for (let i = 0; i < Math.min(flagNames.length, 32); i++) {
            if ((1 << i) & (flags ^ lastFlags)) { // State Changed
                eventState += '|' + flagNames[i] + ' ' + (((1 << i) & flags) ? 'ON' : 'OFF');
                found = true;
@@ -1506,7 +1506,15 @@ function FlightLogFieldPresenter() {
             case 'vel[0]':
             case 'vel[1]':
             case 'vel[2]':
+            case 'velSp[0]':
+            case 'velSp[1]':
+            case 'velSp[2]':
                 return `${(value/100).toFixed(2)} m/s`;
+
+            case 'accSp[0]':
+            case 'accSp[1]':
+            case 'accSp[2]':
+                return `${(value/100).toFixed(2)} m/s/s`;
 
             default:
                 return `${(value)} raw units`;

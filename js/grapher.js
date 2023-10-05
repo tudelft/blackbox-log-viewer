@@ -805,7 +805,8 @@ function FlightLogGrapher(flightLog, graphConfig, canvas, stickCanvas, craftCanv
                         // commonOffset is only true if there is at least one 
                         // field
                         var settings = graph.fields[0].curve.getCurve();
-                        drawAxisZeroLine(-settings.offset / settings.inputRange * canvas.height * graph.height / 2);
+                        if (Math.abs(settings.offset / settings.inputRange) < 1.)
+                            drawAxisZeroLine(-settings.offset / settings.inputRange * canvas.height * graph.height / 2);
                     }
 
                     if(!options.graphGridOverride) {
