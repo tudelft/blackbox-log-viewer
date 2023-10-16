@@ -1498,6 +1498,9 @@ function FlightLogFieldPresenter() {
             case 'pos[0]':
             case 'pos[1]':
             case 'pos[2]':
+            case 'extPos[0]':
+            case 'extPos[1]':
+            case 'extPos[2]':
             case 'posSp[0]':
             case 'posSp[1]':
             case 'posSp[2]':
@@ -1506,6 +1509,9 @@ function FlightLogFieldPresenter() {
             case 'vel[0]':
             case 'vel[1]':
             case 'vel[2]':
+            case 'extVel[0]':
+            case 'extVel[1]':
+            case 'extVel[2]':
             case 'velSp[0]':
             case 'velSp[1]':
             case 'velSp[2]':

@@ -305,11 +305,35 @@ function Craft3D(flightLog, canvas, propColors) {
         }
         
         // Display the craft's attitude
-        craftParent.rotation.x = -frame[frameFieldIndexes['heading[1]']] /*- Math.PI / 2*/; // pitch
-        craftParent.rotation.y = frame[frameFieldIndexes['heading[0]']]; // roll
-        
-        //craftParent.rotation.z = -frame[frameFieldIndexes['heading[2]']]; // yaw
-        
+        var quat_NED = new THREE.Quaternion();
+        if (frameFieldIndexes['quat[0]'] && userSettings.useOnboardAttitude) {
+            quat_NED.x = frame[frameFieldIndexes['quat[1]']] / 8127.;
+            quat_NED.y = frame[frameFieldIndexes['quat[2]']] / 8127.;
+            quat_NED.z = frame[frameFieldIndexes['quat[3]']] / 8127.;
+            quat_NED.w = frame[frameFieldIndexes['quat[0]']] / 8127.;
+        } else {
+            // fallback using the heading angles calculated.
+            // I think this somehow has the wrong euler rotation sequence, but
+            // the sequence is not documented in THREE.js, so i guess we should switch this
+            // to quaternions too
+            const quat_NWU = new THREE.Quaternion().setFromEuler(
+                new THREE.Euler(
+                    frame[frameFieldIndexes['heading[0]']],
+                    frame[frameFieldIndexes['heading[1]']],
+                    -frame[frameFieldIndexes['heading[2]']],
+                    'ZYX'));
+            quat_NED.x = quat_NWU.x;
+            quat_NED.y = -quat_NWU.y;
+            quat_NED.z = -quat_NWU.z;
+            quat_NED.w = quat_NWU.w;
+        }
+
+        // convert NED to THREE.js ENU
+        craftParent.quaternion.x = quat_NED.y;
+        craftParent.quaternion.y = quat_NED.x;
+        craftParent.quaternion.z = -quat_NED.z;
+        craftParent.quaternion.w = quat_NED.w;
+
         renderer.render(scene, camera);
     };
     

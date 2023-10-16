@@ -31,10 +31,12 @@ function BlackboxLogViewer() {
         GRAPH_STATE_PLAY = 1,
         
         SMALL_JUMP_TIME = 100 * 1000,
-        PLAYBACK_MIN_RATE = 10,
+        PLAYBACK_VIDEO_HARD_MIN_RATE = 6.25, // given by chromium https://source.chromium.org/chromium/chromium/src/+/f23e01e01c7072467e0f5eb1f299fdd0032fdc46:third_party/blink/renderer/core/html/media/html_media_element.h;l=108-110
+        PLAYBACK_VIDEO_HARD_MAX_RATE = 1600,
+        PLAYBACK_MIN_RATE = 1,
         PLAYBACK_MAX_RATE = 300,
         PLAYBACK_DEFAULT_RATE = 100,
-        PLAYBACK_RATE_STEP = 5,
+        PLAYBACK_RATE_STEP = 1,
         GRAPH_MIN_ZOOM = 1,
         GRAPH_MAX_ZOOM = 1000,
         GRAPH_DEFAULT_ZOOM = 100,
@@ -79,6 +81,9 @@ function BlackboxLogViewer() {
         hasTable = true, hasAnalyser, hasMap, hasAnalyserFullscreen,
         hasAnalyserSticks = false, viewVideo = true, hasTableOverlay = false, hadTable,
         hasConfig = false, hasConfigOverlay = false,
+
+        // video playback rate acceptable by chromium?
+        playableVideoRate = false,
 
         isFullscreen = false, // New fullscreen feature (to hide table)
 
@@ -244,7 +249,7 @@ function BlackboxLogViewer() {
             return;
         }
         
-        if (hasVideo) {
+        if (hasVideo && playableVideoRate) {
             currentBlackboxTime = blackboxTimeFromVideoTime();
         } else if (graphState == GRAPH_STATE_PLAY) {
             var
@@ -261,6 +266,10 @@ function BlackboxLogViewer() {
             if (currentBlackboxTime > flightLog.getMaxTime()) {
                 currentBlackboxTime = flightLog.getMaxTime();
                 setGraphState(GRAPH_STATE_PAUSED);
+            }
+            
+            if (hasVideo) {
+                setVideoTime((currentBlackboxTime - flightLog.getMinTime()) / 1000000 + videoOffset);
             }
         }
         
@@ -463,7 +472,7 @@ function BlackboxLogViewer() {
         
         switch (newState) {
             case GRAPH_STATE_PLAY:
-                if (hasVideo) {
+                if (hasVideo && playableVideoRate) {
                     video.play();
                 }
                 $("span", btnLogPlayPause).attr('class', 'glyphicon glyphicon-pause');
@@ -524,10 +533,12 @@ function BlackboxLogViewer() {
     }
     
     function setPlaybackRate(rate, updateUi) {
+        playableVideoRate = (rate >= PLAYBACK_VIDEO_HARD_MIN_RATE && rate <= PLAYBACK_VIDEO_HARD_MAX_RATE);
+
         if (rate >= PLAYBACK_MIN_RATE && rate <= PLAYBACK_MAX_RATE) {
               playbackRate = rate;
               
-              if (video) {
+              if (video && playableVideoRate) {
                   video.playbackRate = rate / 100;
               }
         }
@@ -535,7 +546,13 @@ function BlackboxLogViewer() {
         if (updateUi) {
             $(".playback-rate-control").val(playbackRate);
         }
-        
+
+        if (hasVideo && !playableVideoRate) {
+            $(".playback-rate-control .noUi-handle").css("background", "#ff7700");
+        } else {
+            $(".playback-rate-control .noUi-handle").css("background", "#ffffff");
+        }
+
         $(".playback-rate-control .noUi-handle").text(playbackRate + '%');
     }
     
@@ -782,14 +799,15 @@ function BlackboxLogViewer() {
         video.volume = 1.00;
         video.src = videoURL;
         
-        // Reapply the last playbackRate to the new video
-        setPlaybackRate(playbackRate, true);
     }
     
     function videoLoaded(e) {
         hasVideo = true;
         html.toggleClass("has-video", hasVideo);
         
+        // Reapply the last playbackRate to the new video
+        setPlaybackRate(playbackRate, true);
+
         setGraphState(GRAPH_STATE_PAUSED);
         invalidateGraph();
     }

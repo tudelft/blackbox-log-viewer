@@ -630,18 +630,18 @@ function FlightLog(logData) {
                         if (fieldNameToIndex["quat[0]"] && userSettings.useOnboardAttitude) {
                             let quat_scaler = 1./8127.;
                             let quat_all = [fieldNameToIndex["quat[0]"], fieldNameToIndex["quat[1]"], fieldNameToIndex["quat[2]"], fieldNameToIndex["quat[3]"]];
-                            let quat = new THREE.Quaternion(
+                            let quat_NWU = new THREE.Quaternion(
                                 quat_scaler * srcFrame[quat_all[1]],
-                                quat_scaler * srcFrame[quat_all[2]],
-                                quat_scaler * srcFrame[quat_all[3]],
+                                quat_scaler * -srcFrame[quat_all[2]],
+                                quat_scaler * -srcFrame[quat_all[3]],
                                 quat_scaler * srcFrame[quat_all[0]]
                                 );
                             let euler = new THREE.Euler();
-                            euler.setFromQuaternion(quat, "ZYX");
+                            euler.setFromQuaternion(quat_NWU, "ZYX");
                             attitude = {
                                 roll: euler.x,
-                                pitch: -euler.y,
-                                heading: euler.z,
+                                pitch: euler.y,
+                                heading: euler.z, // don't ask me why
                             };
                         } else {
                             attitude = chunkIMU.updateEstimatedAttitude(

@@ -142,9 +142,9 @@ function GraphConfig(graphConfig) {
                     inputRange = (inMax - inMin) / 2 * 1.05; // protection against 0 not necessary
                 for (var j = 0; j < newGraph.fields.length; j++) {
                     if (newGraph.fields[j].commonScale) {
-                        console.log(`${newGraph.fields[j].name}`)
-                        console.log(`Min ${-newGraph.fields[j].curve.offset - newGraph.fields[j].curve.inputRange} to ${-offset - inputRange}`);
-                        console.log(`Max ${-newGraph.fields[j].curve.offset + newGraph.fields[j].curve.inputRange} to ${-offset + inputRange}`);
+                        //console.log(`${newGraph.fields[j].name}`)
+                        //console.log(`Min ${-newGraph.fields[j].curve.offset - newGraph.fields[j].curve.inputRange} to ${-offset - inputRange}`);
+                        //console.log(`Max ${-newGraph.fields[j].curve.offset + newGraph.fields[j].curve.inputRange} to ${-offset + inputRange}`);
                         newGraph.fields[j].curve.offset = offset;
                         newGraph.fields[j].curve.inputRange = Math.max(inputRange, 1.);
                     }
