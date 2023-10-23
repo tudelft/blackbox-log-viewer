@@ -1463,7 +1463,7 @@ function FlightLogFieldPresenter() {
             case 'alphaSp[0]':
             case 'alphaSp[1]':
             case 'alphaSp[2]':
-                return `${(value).toFixed(0)} °/s/s`;
+                return `${(value*10).toFixed(0)} °/s/s`;
 
             case 'spfSp[0]':
             case 'spfSp[1]':

@@ -313,9 +313,11 @@ function Craft3D(flightLog, canvas, propColors) {
             quat_NED.w = frame[frameFieldIndexes['quat[0]']] / 8127.;
         } else {
             // fallback using the heading angles calculated.
-            // I think this somehow has the wrong euler rotation sequence, but
-            // the sequence is not documented in THREE.js, so i guess we should switch this
+            // I think this somehow had the wrong euler rotation sequence, but
+            // the sequence is not documented in THREE.js, so i switched this
             // to quaternions too
+            // blackbox internal heading calculations are in left-handed NWD 
+            // frame. see flightlog.js:injectComputedFields
             const quat_NWU = new THREE.Quaternion().setFromEuler(
                 new THREE.Euler(
                     frame[frameFieldIndexes['heading[0]']],

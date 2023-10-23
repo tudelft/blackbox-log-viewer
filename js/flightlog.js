@@ -628,6 +628,8 @@ function FlightLog(logData) {
 
                     if (gyroADC) { //don't calculate attitude if no gyro data
                         if (fieldNameToIndex["quat[0]"] && userSettings.useOnboardAttitude) {
+                            // onboard quaternion is in NED and scalar-first
+                            // convert to NWD blackbox internal frame...
                             let quat_scaler = 1./8127.;
                             let quat_all = [fieldNameToIndex["quat[0]"], fieldNameToIndex["quat[1]"], fieldNameToIndex["quat[2]"], fieldNameToIndex["quat[3]"]];
                             let quat_NWU = new THREE.Quaternion(
@@ -641,7 +643,7 @@ function FlightLog(logData) {
                             attitude = {
                                 roll: euler.x,
                                 pitch: euler.y,
-                                heading: euler.z, // don't ask me why
+                                heading: -euler.z, // don't ask me why
                             };
                         } else {
                             attitude = chunkIMU.updateEstimatedAttitude(
