@@ -12,8 +12,8 @@ var FlightLogIndex,
 var FlightLogParser = function(logData) {
     //Private constants:
     var
-        FLIGHT_LOG_MAX_FIELDS = 128,
-        FLIGHT_LOG_MAX_FRAME_LENGTH = 256,
+        FLIGHT_LOG_MAX_FIELDS = 512,
+        FLIGHT_LOG_MAX_FRAME_LENGTH = 2048,
 
         //Assume that even in the most woeful logging situation, we won't miss 10 seconds of frames
         MAXIMUM_TIME_JUMP_BETWEEN_FRAMES = (10 * 1000000),
@@ -542,7 +542,7 @@ var FlightLogParser = function(logData) {
 
         lineStart = stream.pos;
 
-        for (; stream.pos < lineStart + 2048 && stream.pos < stream.end; stream.pos++) {
+        for (; stream.pos < lineStart + 4096 && stream.pos < stream.end; stream.pos++) {
             if (separatorPos === false && stream.data[stream.pos] == COLON)
                 separatorPos = stream.pos;
 
