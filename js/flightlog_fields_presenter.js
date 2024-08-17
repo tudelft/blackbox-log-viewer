@@ -1279,6 +1279,12 @@ function FlightLogFieldPresenter() {
             case 'gyroUnfilt[0]':
             case 'gyroUnfilt[1]':
             case 'gyroUnfilt[2]':
+            case 'gyroSp[0]':
+            case 'gyroSp[1]':
+            case 'gyroSp[2]':
+            case 'gyroADCafterRpm[0]':
+            case 'gyroADCafterRpm[1]':
+            case 'gyroADCafterRpm[2]':
                 return flightLog.gyroRawToDegreesPerSecond(value / highResolutionScale).toFixed(highResolutionAddPrecision) + " °/s";
 
             case 'gyroADCs[0]':
@@ -1346,7 +1352,10 @@ function FlightLogFieldPresenter() {
             case 'accSmooth[0]':
             case 'accSmooth[1]':
             case 'accSmooth[2]':
-                return flightLog.accRawToGs(value).toFixed(2 + highResolutionAddPrecision) + " g";
+            case 'accADCafterRpm[0]':
+            case 'accADCafterRpm[1]':
+            case 'accADCafterRpm[2]':
+                return flightLog.accRawToGs(value * 9.80665).toFixed(2 + highResolutionAddPrecision) + " m/s/s";
 
             case 'vbatLatest':
                 if ((flightLog.getSysConfig().firmwareType === FIRMWARE_TYPE_BETAFLIGHT || flightLog.getSysConfig().firmwareType === FIRMWARE_TYPE_INDIFLIGHT)  && semver.gte(flightLog.getSysConfig().firmwareVersion, '4.0.0')) {
@@ -1470,11 +1479,6 @@ function FlightLogFieldPresenter() {
             case 'spfSp[2]':
                 return `${(value/100).toFixed(2)} N/kg`;
 
-            case 'gyroSp[0]':
-            case 'gyroSp[1]':
-            case 'gyroSp[2]':
-                return `${(value).toFixed(0)} °/s`;
-
             case 'omega[0]':
             case 'omega[1]':
             case 'omega[2]':
@@ -1504,6 +1508,9 @@ function FlightLogFieldPresenter() {
             case 'posSp[0]':
             case 'posSp[1]':
             case 'posSp[2]':
+            case 'ekf_pos[0]':
+            case 'ekf_pos[1]':
+            case 'ekf_pos[2]':
                 return `${(value/1000).toFixed(3)} m`;
 
             case 'vel[0]':
@@ -1515,12 +1522,36 @@ function FlightLogFieldPresenter() {
             case 'velSp[0]':
             case 'velSp[1]':
             case 'velSp[2]':
+            case 'ekf_vel[0]':
+            case 'ekf_vel[1]':
+            case 'ekf_vel[2]':
                 return `${(value/100).toFixed(2)} m/s`;
 
             case 'accSp[0]':
             case 'accSp[1]':
             case 'accSp[2]':
                 return `${(value/100).toFixed(2)} m/s/s`;
+
+            case 'ekf_att[0]':
+            case 'ekf_att[1]':
+            case 'ekf_att[2]':
+            case 'extAtt[0]':
+            case 'extAtt[1]':
+            case 'extAtt[2]':
+                return `${(value/1000 * 180 / 3.1415).toFixed(2)} °`;
+
+            case 'extTime':
+                return `${(value/1000).toFixed(3)} ms`;
+
+            case 'ekf_acc_b[0]':
+            case 'ekf_acc_b[1]':
+            case 'ekf_acc_b[2]':
+                return `${(value/1000).toFixed(3)} m/s/s`;
+
+            case 'ekf_gyro_b[0]':
+            case 'ekf_gyro_b[1]':
+            case 'ekf_gyro_b[2]':
+                return `${(value).toFixed(3)} °/s`;
 
             default:
                 return `${(value)} raw units`;

@@ -102,6 +102,10 @@ let
         'GPSRESCUE',
         'VELOCITY',
         'POSITION',
+        'CATAPULT',
+        'LEARNER',
+        'LEGACYPID',
+        'NNCTL',
         'ANTIGRAVITY',
         'HEADADJ',
         'CAMSTAB',
@@ -128,6 +132,7 @@ let
         'CAMERA3',
         'FLIPOVERAFTERCRASH',
         'PREARM',
+        'THROWTOARM',
         'BEEPGPSCOUNT',
         'VTXPITMODE',
         'USER1',
@@ -574,6 +579,11 @@ function adjustFieldDefsList(firmwareType, firmwareVersion) {
         if (firmwareType !== FIRMWARE_TYPE_INDIFLIGHT) {
             FLIGHT_LOG_FLIGHT_MODE_NAME.splice(FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf('VELOCITY'), 1);
             FLIGHT_LOG_FLIGHT_MODE_NAME.splice(FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf('POSITION'), 1);
+            FLIGHT_LOG_FLIGHT_MODE_NAME.splice(FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf('CATAPULT'), 1);
+            FLIGHT_LOG_FLIGHT_MODE_NAME.splice(FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf('LEARNER'), 1);
+            FLIGHT_LOG_FLIGHT_MODE_NAME.splice(FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf('LEGACYPID'), 1);
+            FLIGHT_LOG_FLIGHT_MODE_NAME.splice(FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf('NNCTL'), 1);
+            FLIGHT_LOG_FLIGHT_MODE_NAME.splice(FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf('THROWTOARM'), 1);
         }
         FLIGHT_LOG_FLIGHT_MODE_NAME = makeReadOnly(FLIGHT_LOG_FLIGHT_MODE_NAME);
 
