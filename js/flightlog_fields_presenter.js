@@ -1438,6 +1438,14 @@ function FlightLogFieldPresenter() {
             case 'quatSp[1]':
             case 'quatSp[2]':
             case 'quatSp[3]':
+            case 'ekf_quat[0]':
+            case 'ekf_quat[1]':
+            case 'ekf_quat[2]':
+            case 'ekf_quat[3]':
+            case 'extQuat[0]':
+            case 'extQuat[1]':
+            case 'extQuat[2]':
+            case 'extQuat[3]':
             case 'u[0]':
             case 'u[1]':
             case 'u[2]':
@@ -1532,14 +1540,6 @@ function FlightLogFieldPresenter() {
             case 'accSp[2]':
                 return `${(value/100).toFixed(2)} m/s/s`;
 
-            case 'ekf_att[0]':
-            case 'ekf_att[1]':
-            case 'ekf_att[2]':
-            case 'extAtt[0]':
-            case 'extAtt[1]':
-            case 'extAtt[2]':
-                return `${(value/1000 * 180 / 3.1415).toFixed(2)} °`;
-
             case 'extTime':
                 return `${(value/1000).toFixed(3)} ms`;
 
@@ -1551,7 +1551,15 @@ function FlightLogFieldPresenter() {
             case 'ekf_gyro_b[0]':
             case 'ekf_gyro_b[1]':
             case 'ekf_gyro_b[2]':
-                return `${(value).toFixed(3)} °/s`;
+                return `${(value/1000).toFixed(3)} °/s`;
+
+            case 'ekf_att[0]':
+            case 'ekf_att[1]':
+            case 'ekf_att[2]':
+            case 'extAtt[0]':
+            case 'extAtt[1]':
+            case 'extAtt[2]':
+                return `${(180/3.1415*value/1000).toFixed(3)} °`; // legacy euler quaternion/external attitude
 
             default:
                 return `${(value)} raw units`;

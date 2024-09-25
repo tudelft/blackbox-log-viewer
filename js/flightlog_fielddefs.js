@@ -80,6 +80,7 @@ let
         '3DDISABLE',
         'FPVANGLEMIX',
         'BLACKBOXERASE',
+        'RESETHOME',
         'CAMERA1',
         'CAMERA2',
         'CAMERA3',
@@ -127,6 +128,7 @@ let
         '3D',
         'FPVANGLEMIX',
         'BLACKBOXERASE',
+        'RESETHOME',
         'CAMERA1',
         'CAMERA2',
         'CAMERA3',
@@ -584,6 +586,7 @@ function adjustFieldDefsList(firmwareType, firmwareVersion) {
             FLIGHT_LOG_FLIGHT_MODE_NAME.splice(FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf('LEGACYPID'), 1);
             FLIGHT_LOG_FLIGHT_MODE_NAME.splice(FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf('NNCTL'), 1);
             FLIGHT_LOG_FLIGHT_MODE_NAME.splice(FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf('THROWTOARM'), 1);
+            FLIGHT_LOG_FLIGHT_MODE_NAME.splice(FLIGHT_LOG_FLIGHT_MODE_NAME.indexOf('RESETHOME'), 1);
         }
         FLIGHT_LOG_FLIGHT_MODE_NAME = makeReadOnly(FLIGHT_LOG_FLIGHT_MODE_NAME);
 
